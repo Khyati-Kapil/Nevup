@@ -1,0 +1,21 @@
+:root {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  color: #12211b;
+  background: radial-gradient(circle at top left, #e4fff4, #f6fbf8 55%, #edf6ff);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}

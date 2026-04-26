@@ -1,0 +1,108 @@
+#root {
+  min-height: 100vh;
+}
+
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #d8e6dd;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.state {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #d8e6dd;
+}
+
+.state.error p {
+  color: #8a1f1f;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.btn,
+button,
+.link {
+  border: 1px solid #1e6f4f;
+  background: #1e6f4f;
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn.secondary,
+button:disabled {
+  background: #93a39a;
+  border-color: #93a39a;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  max-width: 480px;
+}
+
+textarea,
+select,
+input[type='range'] {
+  width: 100%;
+}
+
+.muted {
+  color: #3d5d50;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: #f4faf7;
+  border-radius: 8px;
+  padding: 12px;
+  overflow: auto;
+}
+
+.stream {
+  min-height: 120px;
+}
+
+.heatmap {
+  width: 100%;
+  max-width: 420px;
+}
+
+@media (max-width: 375px) {
+  .page {
+    padding: 14px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
