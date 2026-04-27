@@ -1,0 +1,14 @@
+{
+  "name": "nevup-seeded-mock-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csv-parse": "^5.5.6",
+    "express": "^4.21.2"
+  }
+}

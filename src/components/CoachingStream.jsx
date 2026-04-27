@@ -4,6 +4,16 @@ import { buildCoachingSseUrl } from '../lib/api'
 const MAX_RETRIES = 6
 const MAX_DELAY_MS = 10000
 
+function extractToken(data) {
+  try {
+    const parsed = JSON.parse(data)
+    if (typeof parsed?.token === 'string') return parsed.token
+    return typeof data === 'string' ? data : ''
+  } catch {
+    return typeof data === 'string' ? data : ''
+  }
+}
+
 export default function CoachingStream({ sessionId }) {
   const [text, setText] = useState('')
   const [status, setStatus] = useState('connecting')
@@ -53,7 +63,9 @@ export default function CoachingStream({ sessionId }) {
       source.onmessage = (event) => {
         if (cancelled) return
         if (!event.data) return
-        setText((prev) => `${prev}${event.data}`)
+        const token = extractToken(event.data)
+        if (!token) return
+        setText((prev) => `${prev}${token}`)
       }
 
       source.onerror = () => {

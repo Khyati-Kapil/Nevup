@@ -1,6 +1,7 @@
 # NevUp Hackathon 2026 - Track 3 (System of Engagement)
 
-Frontend implementation for post-session debrief and behavioral dashboard, integrated against the provided `nevup_openapi.yaml` mock API contract.
+Frontend implementation for post-session debrief and behavioral dashboard.
+This project now includes a **seeded local mock API** that reads `nevup_seed_dataset.csv`.
 
 ## Tech Stack
 - React + Vite
@@ -9,6 +10,11 @@ Frontend implementation for post-session debrief and behavioral dashboard, integ
 - Axios
 - Zod
 - Lighthouse CI
+- Seeded mock API: Express + CSV parser
+
+## Seeded Data Requirement
+- Seed file path in repo: `data/nevup_seed_dataset.csv`
+- Mock API startup loads this CSV into memory and serves Track 3 endpoints.
 
 ## Run with Docker (reviewer path)
 ```bash
@@ -17,12 +23,14 @@ docker compose up --build
 
 Services:
 - Frontend: `http://localhost:4173`
-- Prism Mock API: `http://localhost:4010`
+- Seeded Mock API: `http://localhost:4010`
 
 ## Run locally (dev path)
-1. Start mock API:
+1. Start seeded mock API:
 ```bash
-npx @stoplight/prism-cli mock nevup_openapi.yaml --host 0.0.0.0 --port 4010
+cd mock-api
+npm install
+npm start
 ```
 2. Start frontend in another terminal:
 ```bash
@@ -30,18 +38,17 @@ npm install
 npm run dev
 ```
 
+## Implemented Track 3 Endpoints (seeded)
+- `GET /api/sessions/:id`
+- `GET /api/users/:id/metrics`
+- `GET /api/users/:id/profile`
+- `POST /api/sessions/:id/debrief`
+- `GET /api/sessions/:id/coaching` (SSE token streaming)
+
 ## Environment Variables
 - `VITE_API_BASE_URL` default: `http://localhost:4010`
 - `VITE_DEMO_USER_ID` default: `f412f236-4edc-47a2-8f54-8763a6ed2ce8`
-- `VITE_DEMO_SESSION_ID` default: `session-1`
-
-## Implemented Track 3 Requirements
-- 5-step post-session debrief flow with per-step transitions
-- Real-time coaching panel via SSE with reconnect/backoff states
-- Custom SVG 90-day heatmap (no heatmap library)
-- Click heatmap cell to open related debrief route
-- Explicit loading, error (with retry), and empty states
-- Keyboard navigation + focus management for debrief flow
+- `VITE_DEMO_SESSION_ID` default: `4f39c2ea-8687-41f7-85a0-1fafd3e976df`
 
 ## Quality Checks
 ```bash
