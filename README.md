@@ -1,17 +1,72 @@
-# React + Vite
+# NevUp Hackathon 2026 - Track 3 (System of Engagement)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend implementation for post-session debrief and behavioral dashboard, integrated against the provided `nevup_openapi.yaml` mock API contract.
 
-Currently, two official plugins are available:
+## Tech Stack
+- React + Vite
+- React Router
+- Framer Motion
+- Axios
+- Zod
+- Lighthouse CI
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run with Docker (reviewer path)
+```bash
+docker compose up --build
+```
 
-## React Compiler
+Services:
+- Frontend: `http://localhost:4173`
+- Prism Mock API: `http://localhost:4010`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Run locally (dev path)
+1. Start mock API:
+```bash
+npx @stoplight/prism-cli mock nevup_openapi.yaml --host 0.0.0.0 --port 4010
+```
+2. Start frontend in another terminal:
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the ESLint configuration
+## Environment Variables
+- `VITE_API_BASE_URL` default: `http://localhost:4010`
+- `VITE_DEMO_USER_ID` default: `f412f236-4edc-47a2-8f54-8763a6ed2ce8`
+- `VITE_DEMO_SESSION_ID` default: `session-1`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# Nevup
+## Implemented Track 3 Requirements
+- 5-step post-session debrief flow with per-step transitions
+- Real-time coaching panel via SSE with reconnect/backoff states
+- Custom SVG 90-day heatmap (no heatmap library)
+- Click heatmap cell to open related debrief route
+- Explicit loading, error (with retry), and empty states
+- Keyboard navigation + focus management for debrief flow
+
+## Quality Checks
+```bash
+npm run lint
+npm run build
+npm run lhci:autorun
+```
+
+Lighthouse CI config: `lighthouserc.json`.
+
+## Required Screenshots for Submission
+Add screenshots to `docs/screenshots/` and reference them below.
+
+### Dashboard Component
+- Loading state: `docs/screenshots/dashboard-loading.png`
+- Error state: `docs/screenshots/dashboard-error.png`
+- Empty state: `docs/screenshots/dashboard-empty.png`
+
+### Debrief Component
+- Loading state: `docs/screenshots/debrief-loading.png`
+- Error state: `docs/screenshots/debrief-error.png`
+- Empty state: `docs/screenshots/debrief-empty.png`
+
+### Coaching Panel
+- Reconnecting/error resilience state: `docs/screenshots/coaching-reconnecting.png`
+
+## Notes
+- In this coding environment, LHCI may fail if Chrome is unavailable. Run LHCI locally on your machine (with Chrome) for final JSON artifacts.
