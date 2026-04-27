@@ -63,6 +63,15 @@ button:disabled {
   border-color: #93a39a;
 }
 
+button:focus-visible,
+.link:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible {
+  outline: 3px solid #0f7b56;
+  outline-offset: 2px;
+}
+
 .field {
   display: grid;
   gap: 8px;
@@ -77,6 +86,28 @@ input[type='range'] {
 
 .muted {
   color: #3d5d50;
+}
+
+.step-heading {
+  margin-top: 0;
+}
+
+.trade-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.trade-list li {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  border: 1px solid #dbe8e1;
+  border-radius: 10px;
+  padding: 10px;
+  background: #f7fcf9;
 }
 
 pre {
@@ -104,5 +135,9 @@ pre {
   .page-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .trade-list li {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Heatmap from '../components/Heatmap'
 import { EmptyState, ErrorState, LoadingState } from '../components/States'
 import { getUserMetrics, getUserProfile } from '../lib/api'
 import { DEMO_USER_ID } from '../lib/constants'
+import { parseApiError } from '../lib/contracts'
 
 export default function DashboardPage() {
   const [profile, setProfile] = useState(null)
@@ -11,23 +12,28 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const load = async () => {
+  const load = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true)
+      if (showLoading) setLoading(true)
       setError('')
       const [p, m] = await Promise.all([getUserProfile(DEMO_USER_ID), getUserMetrics(DEMO_USER_ID)])
       setProfile(p)
       setMetrics(m)
     } catch (e) {
-      setError(e?.response?.data?.message || e.message)
+      const parsed = parseApiError(e)
+      setError(parsed.message)
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    load()
-  }, [])
+    const timer = setTimeout(() => {
+      void load(false)
+    }, 0)
+
+    return () => clearTimeout(timer)
+  }, [load])
 
   const heatmapData = useMemo(() => metrics?.daily || [], [metrics])
 
@@ -41,7 +47,7 @@ export default function DashboardPage() {
       </header>
 
       {loading && <LoadingState label="Loading dashboard..." />}
-      {!loading && error && <ErrorState message={error} onRetry={load} />}
+      {!loading && error && <ErrorState message={error} onRetry={() => load(true)} />}
       {!loading && !error && !metrics && <EmptyState message="No metrics found yet." />}
 
       {!loading && !error && metrics && (
