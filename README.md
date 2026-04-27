@@ -45,6 +45,14 @@ npm run dev
 - `POST /api/sessions/:id/debrief`
 - `GET /api/sessions/:id/coaching` (SSE token streaming)
 
+
+## Auth and Tenancy
+- Frontend auto-generates a demo JWT (HS256, 24h expiry) in browser storage for local testing.
+- API enforces JWT validation and tenancy (`sub === requestedUserId`) with:
+  - `401` for missing/invalid/expired token
+  - `403` for cross-tenant access
+- Error bodies include `traceId`, and API logs include structured `traceId/userId/latency/statusCode`.
+
 ## Environment Variables
 - `VITE_API_BASE_URL` default: `http://localhost:4010`
 - `VITE_DEMO_USER_ID` default: `f412f236-4edc-47a2-8f54-8763a6ed2ce8`

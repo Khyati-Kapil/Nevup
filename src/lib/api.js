@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { API_BASE_URL } from './constants'
-import { authHeaders } from './auth'
+import { authHeaders, ensureDemoToken, getToken } from './auth'
 import { parseMetrics, parseProfile, parseSession } from './contracts'
 
 const api = axios.create({
@@ -8,13 +8,19 @@ const api = axios.create({
   timeout: 8000,
 })
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
+  await ensureDemoToken()
   config.headers = { ...config.headers, ...authHeaders() }
   return config
 })
 
-export async function getUserMetrics(userId) {
-  const { data } = await api.get(`/api/users/${userId}/metrics`)
+export async function getUserMetrics(userId, options = {}) {
+  const params = {
+    from: options.from || '2025-01-01T00:00:00Z',
+    to: options.to || '2026-12-31T23:59:59Z',
+    granularity: options.granularity || 'daily',
+  }
+  const { data } = await api.get(`/api/users/${userId}/metrics`, { params })
   return parseMetrics(data)
 }
 
@@ -29,10 +35,19 @@ export async function getSession(sessionId) {
 }
 
 export async function submitDebrief(sessionId, payload) {
-  const { data } = await api.post(`/api/sessions/${sessionId}/debrief`, payload)
+  const body = {
+    overallMood: payload.emotion,
+    keyMistake: payload.keyMistake || null,
+    keyLesson: payload.takeaway || null,
+    planAdherenceRating: payload.adherence,
+    willReviewTomorrow: true,
+  }
+  const { data } = await api.post(`/api/sessions/${sessionId}/debrief`, body)
   return data
 }
 
-export function buildCoachingSseUrl(sessionId) {
-  return `${API_BASE_URL}/api/sessions/${sessionId}/coaching`
+export async function buildCoachingSseUrl(sessionId) {
+  await ensureDemoToken()
+  const token = getToken()
+  return `${API_BASE_URL}/api/sessions/${sessionId}/coaching?token=${encodeURIComponent(token)}`
 }

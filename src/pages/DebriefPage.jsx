@@ -119,10 +119,13 @@ export default function DebriefPage() {
   const stepAnimation = STEP_ANIMATIONS[step]
 
   return (
-    <main className="page">
+    <main className="page debrief-page">
       <header className="page-header">
-        <h1>Session Debrief</h1>
-        <Link to="/dashboard" className="link">
+        <div>
+          <p className="eyebrow">Session Reflection</p>
+          <h1>Debrief Flow</h1>
+        </div>
+        <Link to="/dashboard" className="btn secondary">
           Dashboard
         </Link>
       </header>
@@ -132,10 +135,17 @@ export default function DebriefPage() {
       {!loading && !error && !session && <EmptyState message="No session found." />}
 
       {!loading && !error && session && (
-        <section className="card" onKeyDown={handleStepKeyDown}>
+        <section className="card debrief-card" onKeyDown={handleStepKeyDown}>
           <h2 className="step-heading" tabIndex="-1" ref={stepHeadingRef}>
             Step {step + 1}/{totalSteps}: {currentStep}
           </h2>
+
+          <div className="progress-rail" aria-hidden="true">
+            {STEPS.map((label, idx) => (
+              <span key={label} className={idx <= step ? 'dot active' : 'dot'} />
+            ))}
+          </div>
+
           <p className="muted">Use Tab / Shift+Tab, Enter, and Arrow keys to complete without mouse.</p>
 
           <AnimatePresence mode="wait">

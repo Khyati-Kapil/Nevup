@@ -44,13 +44,14 @@ export default function CoachingStream({ sessionId }) {
       const delay = Math.min(1000 * 2 ** nextRetry, MAX_DELAY_MS)
 
       timerRef.current = setTimeout(() => {
-        connect(nextRetry)
+        void connect(nextRetry)
       }, delay)
     }
 
-    const connect = (attempt = 0) => {
+    const connect = async (attempt = 0) => {
       if (cancelled) return
-      const source = new EventSource(buildCoachingSseUrl(sessionId))
+      const url = await buildCoachingSseUrl(sessionId)
+      const source = new EventSource(url)
       sourceRef.current = source
       setStatus(attempt === 0 ? 'connecting' : `reconnecting (${attempt})`)
 
@@ -74,7 +75,7 @@ export default function CoachingStream({ sessionId }) {
       }
     }
 
-    connect(0)
+    void connect(0)
 
     return () => {
       cancelled = true

@@ -1,16 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Outfit:wght@500;700&display=swap');
+
 :root {
-  font-family: 'Manrope', 'Segoe UI', sans-serif;
-  color: #12211b;
-  background: radial-gradient(circle at top left, #e4fff4, #f6fbf8 55%, #edf6ff);
+  --navy-900: #0f1330;
+  --navy-800: #171d44;
+  --navy-700: #222a63;
+  --lav-400: #b7a7ff;
+  --lav-300: #cbbfff;
+  --lav-200: #e3dcff;
+  --ink: #f0f2ff;
+  --ink-soft: #bec4e4;
+  --card: rgba(25, 31, 70, 0.72);
+  --line: rgba(206, 196, 255, 0.22);
+  --success: #3fd0a0;
+
+  font-family: 'Sora', sans-serif;
+  color: var(--ink);
+  background: radial-gradient(1200px 700px at 10% -10%, #2f2a6f 0%, transparent 50%),
+    radial-gradient(900px 600px at 95% 0%, #4e3c87 0%, transparent 48%),
+    linear-gradient(165deg, var(--navy-900), var(--navy-800));
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
-  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
 }
 
 button,

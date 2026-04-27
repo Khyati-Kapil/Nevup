@@ -25,8 +25,32 @@ const DayMetricSchema = z.object({
   sessionId: z.string().optional().default('session-1'),
 })
 
+const TimeseriesPointSchema = z.object({
+  bucket: z.string().optional().default(''),
+  tradeCount: z.number().int().optional().default(0),
+  winRate: z.number().optional().default(0),
+  pnl: z.number().optional().default(0),
+  avgPlanAdherence: z.number().optional().default(0),
+})
+
+const EmotionStatsSchema = z.object({
+  wins: z.number().int().optional().default(0),
+  losses: z.number().int().optional().default(0),
+  winRate: z.number().optional().default(0),
+})
+
 const MetricsSchema = z.object({
+  userId: z.string().optional().default(''),
+  granularity: z.string().optional().default('daily'),
+  from: z.string().nullable().optional().default(null),
+  to: z.string().nullable().optional().default(null),
+  planAdherenceScore: z.number().optional().default(0),
+  sessionTiltIndex: z.number().optional().default(0),
+  revengeTrades: z.number().int().optional().default(0),
+  overtradingEvents: z.number().int().optional().default(0),
   daily: z.array(DayMetricSchema).optional().default([]),
+  timeseries: z.array(TimeseriesPointSchema).optional().default([]),
+  winRateByEmotionalState: z.record(z.string(), EmotionStatsSchema).optional().default({}),
 })
 
 const ProfileSchema = z.record(z.string(), z.unknown())
@@ -51,21 +75,49 @@ export function parseSession(raw) {
   return SessionSchema.parse(normalized)
 }
 
+function normalizeTimeseries(raw) {
+  const rows = Array.isArray(raw?.timeseries) ? raw.timeseries : []
+  return rows.map((row) => ({
+    bucket: row?.bucket || row?.date || row?.day || '',
+    tradeCount: Number(row?.tradeCount ?? row?.count ?? 0),
+    winRate: Number(row?.winRate ?? 0),
+    pnl: Number(row?.pnl ?? 0),
+    avgPlanAdherence: Number(row?.avgPlanAdherence ?? row?.planAdherence ?? 0),
+  }))
+}
+
+function normalizeDaily(raw, fallbackTimeseries) {
+  const dailyRows = Array.isArray(raw?.daily) ? raw.daily : []
+  if (dailyRows.length > 0) {
+    return dailyRows.map((row) => ({
+      date: row?.date || row?.day || '',
+      score: Number(row?.score ?? row?.quality ?? row?.value ?? 0),
+      sessionId: row?.sessionId || row?.session_id || 'session-1',
+    }))
+  }
+
+  return fallbackTimeseries.map((point) => ({
+    date: point.bucket,
+    score: Math.max(0, Math.min(100, Math.round(point.winRate * 70 + point.avgPlanAdherence * 10))),
+    sessionId: 'session-1',
+  }))
+}
+
 export function parseMetrics(raw) {
-  const dailyRows =
-    raw?.daily ||
-    raw?.timeseries ||
-    raw?.data ||
-    []
+  const timeseries = normalizeTimeseries(raw)
 
   const normalized = {
-    daily: Array.isArray(dailyRows)
-      ? dailyRows.map((row) => ({
-          date: row?.date || row?.day || '',
-          score: Number(row?.score ?? row?.quality ?? row?.value ?? 0),
-          sessionId: row?.sessionId || row?.session_id || 'session-1',
-        }))
-      : [],
+    userId: raw?.userId || '',
+    granularity: raw?.granularity || 'daily',
+    from: raw?.from || null,
+    to: raw?.to || null,
+    planAdherenceScore: Number(raw?.planAdherenceScore ?? 0),
+    sessionTiltIndex: Number(raw?.sessionTiltIndex ?? 0),
+    revengeTrades: Number(raw?.revengeTrades ?? 0),
+    overtradingEvents: Number(raw?.overtradingEvents ?? 0),
+    timeseries,
+    daily: normalizeDaily(raw, timeseries),
+    winRateByEmotionalState: raw?.winRateByEmotionalState || {},
   }
 
   return MetricsSchema.parse(normalized)

@@ -1,5 +1,10 @@
 export function LoadingState({ label = 'Loading...' }) {
-  return <div className="state loading">{label}</div>
+  return (
+    <div className="state loading">
+      <div className="pulse" aria-hidden="true" />
+      <p>{label}</p>
+    </div>
+  )
 }
 
 export function ErrorState({ message, onRetry }) {
@@ -14,5 +19,9 @@ export function ErrorState({ message, onRetry }) {
 }
 
 export function EmptyState({ message }) {
-  return <div className="state empty">{message || 'No data yet.'}</div>
+  return (
+    <div className="state empty">
+      <p>{message || 'No data yet.'}</p>
+    </div>
+  )
 }

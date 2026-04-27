@@ -3,7 +3,7 @@ import cors from 'cors'
 import fs from 'node:fs'
 import path from 'node:path'
 import { parse } from 'csv-parse/sync'
-import { randomUUID } from 'node:crypto'
+import { createHmac, randomUUID } from 'node:crypto'
 
 const app = express()
 app.use(cors())
@@ -11,6 +11,9 @@ app.use(express.json())
 
 const PORT = Number(process.env.PORT || 4010)
 const SEED_FILE = process.env.SEED_FILE || path.resolve(process.cwd(), '../data/nevup_seed_dataset.csv')
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  '97791d4db2aa5f689c3cc39356ce35762f0a73aa70923039d8ef72a2840a1b02'
 
 function toNum(v) {
   if (v === null || v === undefined || v === '') return null
@@ -65,6 +68,88 @@ function loadData() {
 
 const store = loadData()
 const debriefs = new Map()
+
+function base64urlToBase64(input) {
+  return input.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(input.length / 4) * 4, '=')
+}
+
+function parseJwt(token) {
+  const parts = token.split('.')
+  if (parts.length !== 3) throw new Error('Malformed token')
+  const [headerPart, payloadPart, signaturePart] = parts
+  const header = JSON.parse(Buffer.from(base64urlToBase64(headerPart), 'base64').toString('utf8'))
+  const payload = JSON.parse(Buffer.from(base64urlToBase64(payloadPart), 'base64').toString('utf8'))
+
+  if (header.alg !== 'HS256') throw new Error('Invalid alg')
+
+  const sig = createHmac('sha256', JWT_SECRET)
+    .update(`${headerPart}.${payloadPart}`)
+    .digest('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+
+  if (sig !== signaturePart) throw new Error('Invalid signature')
+  if (!payload.sub || !payload.exp || !payload.iat) throw new Error('Missing claims')
+  if (Math.floor(Date.now() / 1000) >= Number(payload.exp)) throw new Error('Expired')
+
+  return payload
+}
+
+function errorBody(traceId, error, message) {
+  return { traceId, error, message }
+}
+
+function authRequired(req, res, next) {
+  if (req.path === '/health') return next()
+
+  const auth = req.headers.authorization || ''
+  const queryToken = typeof req.query?.token === 'string' ? req.query.token : ''
+  const traceId = req.traceId
+
+  let token = ''
+  if (auth.startsWith('Bearer ')) token = auth.slice(7)
+  if (!token && queryToken) token = queryToken
+
+  if (!token) {
+    return res.status(401).json(errorBody(traceId, 'UNAUTHORIZED', 'Missing Authorization header.'))
+  }
+
+  try {
+    req.jwt = parseJwt(token)
+    return next()
+  } catch {
+    return res.status(401).json(errorBody(traceId, 'UNAUTHORIZED', 'Invalid or expired token.'))
+  }
+}
+
+app.use((req, res, next) => {
+  req.traceId = randomUUID()
+  res.setHeader('x-trace-id', req.traceId)
+  const started = Date.now()
+
+  res.on('finish', () => {
+    const logLine = {
+      traceId: req.traceId,
+      userId: req.jwt?.sub || null,
+      latency: Date.now() - started,
+      statusCode: res.statusCode,
+      method: req.method,
+      path: req.path,
+    }
+    console.log(JSON.stringify(logLine))
+  })
+
+  next()
+})
+
+app.use(authRequired)
+
+function forbid(res, traceId) {
+  return res
+    .status(403)
+    .json(errorBody(traceId, 'FORBIDDEN', 'Cross-tenant access denied.'))
+}
 
 function summarizeSession(sessionId) {
   const trades = store.bySession.get(sessionId)
@@ -128,9 +213,7 @@ function buildMetrics(userId, granularity = 'daily', from = null, to = null) {
       const wins = bucketTrades.filter((t) => t.outcome === 'win').length
       const pnl = bucketTrades.reduce((a, t) => a + (t.pnl || 0), 0)
       const paTrades = bucketTrades.filter((t) => Number.isFinite(t.planAdherence))
-      const avgPlan = paTrades.length
-        ? paTrades.reduce((a, t) => a + t.planAdherence, 0) / paTrades.length
-        : 0
+      const avgPlan = paTrades.length ? paTrades.reduce((a, t) => a + t.planAdherence, 0) / paTrades.length : 0
       return {
         bucket,
         tradeCount: bucketTrades.length,
@@ -187,21 +270,31 @@ app.get('/health', (_req, res) => {
 
 app.get('/api/sessions/:sessionId', (req, res) => {
   const session = summarizeSession(req.params.sessionId)
-  if (!session) return res.status(404).json({ error: 'NOT_FOUND', message: 'Session not found' })
-  res.json(session)
+  if (!session) return res.status(404).json(errorBody(req.traceId, 'NOT_FOUND', 'Session not found'))
+  if (req.jwt.sub !== session.userId) return forbid(res, req.traceId)
+  return res.json(session)
 })
 
 app.post('/api/sessions/:sessionId/debrief', (req, res) => {
   const session = summarizeSession(req.params.sessionId)
-  if (!session) return res.status(404).json({ error: 'NOT_FOUND', message: 'Session not found' })
+  if (!session) return res.status(404).json(errorBody(req.traceId, 'NOT_FOUND', 'Session not found'))
+  if (req.jwt.sub !== session.userId) return forbid(res, req.traceId)
+
   const payload = req.body || {}
   debriefs.set(req.params.sessionId, payload)
-  res.status(201).json({ debriefId: randomUUID(), sessionId: req.params.sessionId, savedAt: new Date().toISOString() })
+  return res.status(201).json({
+    debriefId: randomUUID(),
+    sessionId: req.params.sessionId,
+    savedAt: new Date().toISOString(),
+  })
 })
 
 app.get('/api/sessions/:sessionId/coaching', (req, res) => {
   const session = summarizeSession(req.params.sessionId)
   if (!session) return res.status(404).end()
+  if (req.jwt.sub !== session.userId) {
+    return res.status(403).json(errorBody(req.traceId, 'FORBIDDEN', 'Cross-tenant access denied.'))
+  }
 
   res.setHeader('Content-Type', 'text/event-stream')
   res.setHeader('Cache-Control', 'no-cache')
@@ -227,20 +320,25 @@ app.get('/api/sessions/:sessionId/coaching', (req, res) => {
 
 app.get('/api/users/:userId/metrics', (req, res) => {
   const userId = req.params.userId
+  if (req.jwt.sub !== userId) return forbid(res, req.traceId)
+
   const trades = store.byUser.get(userId)
   if (!trades || trades.length === 0) {
-    return res.status(404).json({ error: 'NOT_FOUND', message: 'User not found' })
+    return res.status(404).json(errorBody(req.traceId, 'NOT_FOUND', 'User not found'))
   }
 
   const { from, to, granularity = 'daily' } = req.query
   const metrics = buildMetrics(userId, String(granularity), from ? String(from) : null, to ? String(to) : null)
-  res.json(metrics)
+  return res.json(metrics)
 })
 
 app.get('/api/users/:userId/profile', (req, res) => {
-  const profile = buildProfile(req.params.userId)
-  if (!profile) return res.status(404).json({ error: 'NOT_FOUND', message: 'User not found' })
-  res.json(profile)
+  const userId = req.params.userId
+  if (req.jwt.sub !== userId) return forbid(res, req.traceId)
+
+  const profile = buildProfile(userId)
+  if (!profile) return res.status(404).json(errorBody(req.traceId, 'NOT_FOUND', 'User not found'))
+  return res.json(profile)
 })
 
 app.listen(PORT, () => {
