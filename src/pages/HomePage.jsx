@@ -3,88 +3,72 @@ import { Link } from 'react-router-dom'
 import { DEMO_SESSION_ID } from '../lib/constants'
 
 const fadeUp = {
-  initial: { opacity: 0, y: 28 },
+  initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.25 },
-  transition: { duration: 0.5 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.45 },
 }
+
+const statTiles = [
+  { label: 'Sessions Tracked', value: '52', sub: 'Seeded reference sessions' },
+  { label: 'Total Trades', value: '388', sub: 'Across 10 traders' },
+  { label: 'Debrief Steps', value: '5', sub: 'Keyboard-complete flow' },
+  { label: 'Insight Window', value: '90D', sub: 'Custom heatmap range' },
+]
 
 export default function HomePage() {
   return (
-    <main className="landing-v4">
-      <section className="hero-v4 section-screen" id="top">
+    <main className="landing-v5">
+      <header className="nav-shell">
+        <nav className="top-nav">
+          <a className="brand" href="#top">NevUp</a>
+          <div className="nav-links">
+            <a href="#stats">Metrics</a>
+            <a href="#architecture">Features</a>
+            <a href="#journey">Journey</a>
+          </div>
+          <div className="nav-actions">
+            <Link className="btn ghost" to="/dashboard">Dashboard</Link>
+            <Link className="btn" to={`/debrief/${DEMO_SESSION_ID}`}>Debrief</Link>
+          </div>
+        </nav>
+      </header>
+
+      <section className="hero-v5 section-tight" id="top">
         <div className="noise" aria-hidden="true" />
         <motion.div className="hero-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <p className="eyebrow">NevUp · Track 3 System of Engagement</p>
-          <h1>Behavioral Coaching Interface for Serious Traders</h1>
-          <p>
-            A full post-session workflow with replay, emotion tagging, plan scoring, and live coaching designed to make
-            trading discipline visible and actionable.
-          </p>
+          <p className="eyebrow">NevUp · Track 3 · System of Engagement</p>
+          <h1>Behavioral Coaching Interface for Traders Who Want Measurable Growth</h1>
+          <p>Replay decisions, tag emotions, score plan adherence, stream coaching, and save one behavioral takeaway.</p>
           <div className="actions">
-            <Link className="btn" to="/dashboard">
-              Open Dashboard
-            </Link>
-            <Link className="btn alt" to={`/debrief/${DEMO_SESSION_ID}`}>
-              Start Debrief
-            </Link>
-            <a className="btn ghost" href="#overview">
-              Explore Features
-            </a>
+            <Link className="btn" to="/dashboard">Open Dashboard</Link>
+            <Link className="btn alt" to={`/debrief/${DEMO_SESSION_ID}`}>Start Debrief</Link>
           </div>
         </motion.div>
       </section>
 
-      <section className="section-screen section-block" id="overview">
-        <motion.div className="section-grid" {...fadeUp}>
-          <article className="feature-panel">
-            <h2>What This Product Delivers</h2>
-            <ul>
-              <li>5-step keyboard-complete debrief flow</li>
-              <li>Token-streamed coaching with reconnect behavior</li>
-              <li>90-day custom heatmap with session drill-down</li>
-              <li>Error/loading/empty states in every data component</li>
-            </ul>
-          </article>
-          <article className="feature-panel soft">
-            <h3>User Story</h3>
-            <p>
-              A trader completes a session, replays decisions, tags emotional state, receives coaching in real time, and
-              commits one behavioral takeaway before the next market day.
-            </p>
-          </article>
+      <section className="section-tight dense-grid" id="stats">
+        {statTiles.map((tile, idx) => (
+          <motion.article key={tile.label} className="metric-tile" {...fadeUp} transition={{ delay: 0.05 * idx }}>
+            <span>{tile.label}</span><strong>{tile.value}</strong><p>{tile.sub}</p>
+          </motion.article>
+        ))}
+      </section>
+
+      <section className="section-tight section-panel" id="architecture">
+        <motion.div className="panel-head" {...fadeUp}>
+          <h2>Product Narrative, Not Just UI Screens</h2>
+          <p>Each section reveals behavior patterns, explains causes, and recommends what to change next session.</p>
         </motion.div>
       </section>
 
-      <section className="section-screen section-block">
-        <motion.div className="timeline" {...fadeUp}>
-          <h2>Debrief Journey</h2>
-          <div className="timeline-row">
-            <div><span>1</span>Replay Trades</div>
-            <div><span>2</span>Tag Emotion</div>
-            <div><span>3</span>Rate Plan Adherence</div>
-            <div><span>4</span>Read Live Coach</div>
-            <div><span>5</span>Save Takeaway</div>
-          </div>
+      <section className="section-tight timeline-band" id="journey">
+        <motion.div className="panel-head" {...fadeUp}>
+          <h2>Debrief Sequence</h2>
         </motion.div>
-      </section>
-
-      <section className="section-screen section-block">
-        <motion.div className="cta-panel" {...fadeUp}>
-          <h2>Ready for Review</h2>
-          <p>
-            Built against seeded data and real endpoints. Start from dashboard for analytics, then run one debrief to
-            experience the complete behavior loop.
-          </p>
-          <div className="actions">
-            <Link className="btn" to="/dashboard">
-              Go to Dashboard
-            </Link>
-            <Link className="btn alt" to={`/debrief/${DEMO_SESSION_ID}`}>
-              Run Debrief Now
-            </Link>
-          </div>
-        </motion.div>
+        <div className="timeline-row">
+          <div><span>1</span>Trade Replay</div><div><span>2</span>Emotion Tagging</div><div><span>3</span>Plan Scoring</div><div><span>4</span>Live Coaching</div><div><span>5</span>Takeaway Commit</div>
+        </div>
       </section>
     </main>
   )
