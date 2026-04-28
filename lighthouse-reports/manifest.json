@@ -1,0 +1,110 @@
+[
+  {
+    "url": "http://127.0.0.1:4173/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1--2026_04_28_08_10_43.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1--2026_04_28_08_10_43.report.json",
+    "summary": {
+      "performance": 0.81,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1--2026_04_28_08_11_08.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1--2026_04_28_08_11_08.report.json",
+    "summary": {
+      "performance": 0.86,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/dashboard",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-dashboard-2026_04_28_08_11_18.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-dashboard-2026_04_28_08_11_18.report.json",
+    "summary": {
+      "performance": 0.82,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/dashboard",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-dashboard-2026_04_28_08_11_41.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-dashboard-2026_04_28_08_11_41.report.json",
+    "summary": {
+      "performance": 0.89,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/debrief/session-1",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-debrief_session_1-2026_04_28_08_11_51.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-debrief_session_1-2026_04_28_08_11_51.report.json",
+    "summary": {
+      "performance": 0.82,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/debrief/session-1",
+    "isRepresentativeRun": false,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-debrief_session_1-2026_04_28_08_12_15.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-debrief_session_1-2026_04_28_08_12_15.report.json",
+    "summary": {
+      "performance": 0.89,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1--2026_04_28_08_10_57.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1--2026_04_28_08_10_57.report.json",
+    "summary": {
+      "performance": 0.86,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/dashboard",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-dashboard-2026_04_28_08_11_30.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-dashboard-2026_04_28_08_11_30.report.json",
+    "summary": {
+      "performance": 0.82,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "http://127.0.0.1:4173/debrief/session-1",
+    "isRepresentativeRun": true,
+    "htmlPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-debrief_session_1-2026_04_28_08_12_02.report.html",
+    "jsonPath": "/Users/khyati/Noor-AI/server/src/config/Nevup/Nevup/nevup-frontend/lighthouse-reports/127_0_0_1-debrief_session_1-2026_04_28_08_12_02.report.json",
+    "summary": {
+      "performance": 0.81,
+      "accessibility": 1,
+      "best-practices": 0.96,
+      "seo": 0.82
+    }
+  }
+]
