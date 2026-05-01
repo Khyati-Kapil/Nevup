@@ -28,7 +28,7 @@ app.options('*', cors(corsOptions))
 app.use(express.json())
 
 const PORT = Number(process.env.PORT || 4010)
-const SEED_FILE = process.env.SEED_FILE || path.resolve(process.cwd(), '../data/nevup_seed_dataset.csv')
+const SEED_FILE = process.env.SEED_FILE || path.resolve(process.cwd(), './nevup_seed_dataset.csv')
 const JWT_SECRET =
   process.env.JWT_SECRET ||
   '97791d4db2aa5f689c3cc39356ce35762f0a73aa70923039d8ef72a2840a1b02'
