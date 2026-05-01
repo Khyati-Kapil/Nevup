@@ -5,14 +5,44 @@ import { parseMetrics, parseProfile, parseSession } from './contracts'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 8000,
+  // Render free tier cold starts can exceed 8s; be more forgiving.
+  timeout: 25000,
 })
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
 
 api.interceptors.request.use(async (config) => {
   await ensureDemoToken()
   config.headers = { ...config.headers, ...authHeaders() }
+  config.__retryCount = config.__retryCount || 0
   return config
 })
+
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const config = error?.config
+    if (!config) throw error
+
+    const status = error?.response?.status
+    const isTimeout = error?.code === 'ECONNABORTED' || String(error?.message || '').toLowerCase().includes('timeout')
+    const shouldRetry = isTimeout || (typeof status === 'number' && status >= 500)
+
+    if (!shouldRetry) throw error
+
+    const maxRetries = 2
+    const retryCount = config.__retryCount || 0
+    if (retryCount >= maxRetries) throw error
+
+    config.__retryCount = retryCount + 1
+
+    // Backoff: 1.2s, 2.4s
+    await sleep(1200 * 2 ** retryCount)
+    return api.request(config)
+  },
+)
 
 export async function getUserMetrics(userId, options = {}) {
   const params = {
