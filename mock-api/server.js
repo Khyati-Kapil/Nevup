@@ -6,7 +6,25 @@ import { parse } from 'csv-parse/sync'
 import { createHmac, randomUUID } from 'node:crypto'
 
 const app = express()
-app.use(cors())
+
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:4173,https://nevup.vercel.app')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) return callback(null, true)
+    if (allowedOrigins.includes(origin)) return callback(null, true)
+    return callback(new Error('Not allowed by CORS'))
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}
+
+app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 app.use(express.json())
 
 const PORT = Number(process.env.PORT || 4010)
@@ -101,6 +119,7 @@ function errorBody(traceId, error, message) {
 }
 
 function authRequired(req, res, next) {
+  if (req.method === 'OPTIONS') return res.sendStatus(204)
   if (req.path === '/health') return next()
 
   const auth = req.headers.authorization || ''
